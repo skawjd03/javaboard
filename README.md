@@ -23,3 +23,4 @@ jsp를 사용하고 온 후라 굉장히 편하고 설정만 잘하면 알아서
 <li> 대댓글 기능</li>
 <li> 댓글 보여주기 스크롤기능(유튜브참조)</li>
 
+![Alt Text](https://k.kakaocdn.net/dn/LjRfQ/btqwqjJB1ZG/UkgU00G4lUAy6DQ7z51qA0/img.png)
