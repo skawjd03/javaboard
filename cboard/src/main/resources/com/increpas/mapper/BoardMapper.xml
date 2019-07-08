@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.increpas.mapper.BoardMapper">
+
+
+	<sql id="criteria">
+      <trim prefix="(" suffix=") AND " prefixOverrides="OR">
+         <foreach item='type' collection="typeArr">
+            <trim prefix="OR">
+               <choose>
+                  <when test="type== 'T'.toString()">
+                     BOARDTITLE like '%' || #{keyword}||'%'
+                  </when>
+                  <when test="type== 'C'.toString()">
+                     BOARDCONTENT like '%' || #{keyword}||'%'
+                  </when>
+                  <when test="type== 'W'.toString()">
+                     BOARDWRITER like '%' || #{keyword}||'%'
+                  </when>
+               </choose>
+            </trim>
+         </foreach>
+      </trim>
+   </sql>
+
+	<select id="getList" resultType="com.increpas.domain.BoardVO">
+		<![CDATA[
+         select 
+             * 
+         from 
+             (select 
+                 /*+ INDEX_DESC(increpas_board PK_INCREPAS_BOARD) */ 
+             rownum rno,boardBno,BOARDCATEGORY,BOARDCONTENT,BOARDDATE,BOARDHIT,BOARDTITLE,BOARDUPDATEDATE,BOARDWRITER 
+             from 
+                 increpas_board 
+             where 
+        ]]>
+        
+        <include refid="criteria"></include>
+        
+        <![CDATA[
+                 rownum<=(#{pageNum} * #{amount}) and boardIsShow != 'N') 
+         where rno>(#{pageNum}-1)*#{amount}
+        ]]>
+      
+	</select>
+	
+	<select id="countTotal" resultType="int">
+		select count(*) from increpas_board where
+		<include refid="criteria"></include>
+		boardIsShow != 'N'
+	</select>
+	
+	<insert id="writeBoard">
+      <selectKey keyProperty="boardBno" resultType="int" order="BEFORE">
+           SELECT inc_Board_seq.nextval from dual
+       </selectKey> 
+      insert into increpas_board values(#{boardBno}, #{boardCategory},
+      #{boardTitle},#{boardWriter},sysdate,sysdate,0,#{boardContent},'Y')
+   </insert>
+   
+   <update id="hitBoard">
+   	update increpas_board
+   	set
+   		boardHit=boardHit+1
+   	where
+   		boardBno = #{boardBno}
+   </update>
+   
+   <update id="updateBoard">
+      update increpas_board
+      set boardTitle=#{boardTitle},
+          boardUpdateDate=sysdate,
+          boardContent=#{boardContent}
+      where
+         boardBno = #{boardBno}
+   </update>
+   
+   <update id="deleteBoard">
+      update increpas_board
+      set 
+          boardIsShow='N'
+      where
+         boardBno = #{boardBno}
+   </update>
+  
+  	<select id="getView" resultType="com.increpas.domain.BoardVO">
+  		<![CDATA[
+			select * from increpas_board where boardBno = #{boardBno} and boardisShow != 'N'
+		]]>
+  	</select>
+</mapper>

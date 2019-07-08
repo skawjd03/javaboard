@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.increpas.mapper.ReReplyMapper">
+	<insert id="insertReply">
+      insert into increpas_rereply values(#{ReplyCno}, inc_rereply_seq.nextval,
+      #{replyWriter},#{replyContent},'Y',sysdate,sysdate,0,#{replyTagName})
+   </insert>
+   
+  	<select id="selectReply" resultType="com.increpas.domain.ReReplyVO">
+   		select * from increpas_rereply where ReplyCno = #{replyCno} and isShow != 'N'
+   </select>
+   
+   <select id="countReply" resultType="int">
+   		select count(*) cnt from increpas_rereply where ReplyCno = #{replyCno} and isShow != 'N'
+   </select>
+   
+   <update id="updateReply">
+      update increpas_rereply
+      set ReplyContent = #{ReplyContent},
+      	  replyUpdate = sysdate
+      where
+         ReplyCCno = #{ReplyCCno}
+   </update>
+   
+    <update id="deleteReply">
+      update increpas_rereply
+      set 
+          isShow='N'
+      where
+         ReplyCCno = #{ReplyCCno}
+   </update>
+</mapper>
